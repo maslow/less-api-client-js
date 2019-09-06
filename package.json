@@ -1,0 +1,29 @@
+{
+  "name": "less-api-client",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "mocha tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maslow/less-api-client-js.git"
+  },
+  "keywords": [
+    "less-api",
+    "less-api-client"
+  ],
+  "author": "maslow (wangfugen@126.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Maslow/less-api-client-js/issues"
+  },
+  "homepage": "https://github.com/Maslow/less-api-client-js#readme",
+  "dependencies": {
+    "@cloudbase/database": "^0.5.0"
+  },
+  "devDependencies": {
+    "less-api": "0.0.5"
+  }
+}
