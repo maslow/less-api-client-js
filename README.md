@@ -13,7 +13,7 @@ Javascript client sdk of [`less-api`](https://github.com/Maslow/less-api).
 
 ```js
 const cloud = require('less-api-client').init({
-    url: 'http://localhost:8080/entry',
+    entryUrl: 'http://localhost:8080/entry',
     getAccessToken: () => localStorage.getItem('access_token')
 })
 
