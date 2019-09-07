@@ -15,7 +15,7 @@ describe('Database', function () {
         const cloud = client.init(config)
 
         const res = await cloud.database().collection('categories').get()
-        console.log(res.data.length)
+
         assert.ok(res.data instanceof Array)
     })
 })
