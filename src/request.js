@@ -1,11 +1,11 @@
 const request = require('superagent')
 
 class Request {
-  constructor(config) {
+  constructor (config) {
     this.config = config
   }
 
-  async send(action, data) {
+  async send (action, data) {
     const params = Object.assign({}, data, {
       action
     })
@@ -13,17 +13,19 @@ class Request {
     const slowQueryWarning = setTimeout(() => {
       console.warn(
         'Database operation is longer than 3s. Please check query performance and your network environment.'
-      );
-    }, 3000);
+      )
+    }, 3000)
 
     const token = this.config.getAccessToken()
     try {
-      return await request
+      const res = await request
         .post(this.config.entryUrl)
         .set('Accept', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .timeout(this.config.timeout)
         .send(params)
+
+      return res.body
     } finally {
       clearTimeout(slowQueryWarning)
     }

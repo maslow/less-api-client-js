@@ -1,7 +1,7 @@
 const assert = require('assert')
-const client = require('../src/index')
+const client = require('../../src/index')
 const Db = require('@cloudbase/database').Db
-const Request = require('../src/request')
+const Request = require('../../src/request')
 
 function getAccessToken(){
     return 'test-token-xxx'
