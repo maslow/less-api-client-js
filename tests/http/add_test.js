@@ -16,8 +16,17 @@ describe('Database', function () {
 
         const result = await cloud.database()
             .collection('categories')
-            .add({ title: 'title-add', content: 'content-add'})
+            .add({
+                title: 'title-add-2',
+                content: 'content-add-2'
+            })
+
+        const {data} = await cloud.database()
+            .collection('categories')
+            .doc(result.id)
+            .get()
 
         assert.ok(result.id)
+        assert.equal(data[0]._id, result.id)
     })
 })
