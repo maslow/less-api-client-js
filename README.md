@@ -57,7 +57,7 @@ const removed = await db.collection('articles').doc('the-doc-id').remove()
 客户端数据操作采取了[腾讯云云开发的接口](https://github.com/TencentCloudBase/tcb-js-sdk/blob/master/docs/database.md)设计。
 
 
-# 数据库
+#### 数据库
 
 - [获取数据库的引用](#获取数据库的引用)
 - [获取集合的引用](#获取集合的引用)
