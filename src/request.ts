@@ -1,11 +1,13 @@
-const request = require('superagent')
+import request from 'axios'
+import { Config } from './cloud'
 
-class Request {
-  constructor (config) {
+export class Request {
+  private config: Config
+  constructor (config: Config) {
     this.config = config
   }
 
-  async send (action, data) {
+  async send (action: string, data: object) {
     const params = Object.assign({}, data, {
       action
     })
@@ -19,17 +21,17 @@ class Request {
     const token = this.config.getAccessToken()
     try {
       const res = await request
-        .post(this.config.entryUrl)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .timeout(this.config.timeout)
-        .send(params)
+        .post(this.config.entryUrl, params, {
+          headers:{
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          timeout: this.config.timeout
+        })
 
-      return res.body
+      return res.data
     } finally {
       clearTimeout(slowQueryWarning)
     }
   }
 }
-
-module.exports = Request

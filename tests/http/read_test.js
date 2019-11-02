@@ -1,21 +1,21 @@
 const assert = require('assert')
-const client = require('../../src/index')
+const client = require('../../dist/commonjs/index')
 
 function getAccessToken(){
-    return 'test-token-xxx'
+  return 'test-token-xxx'
 }
 
 const config = {
-    entryUrl: 'http://localhost:8080/entry',
-    getAccessToken
+  entryUrl: 'http://localhost:8080/entry',
+  getAccessToken
 }
 
 describe('Database', function () {
-    it('read empty should be ok', async () => {
-        const cloud = client.init(config)
+  it('read empty should be ok', async () => {
+    const cloud = client.init(config)
 
-        const res = await cloud.database().collection('categories').get()
+    const res = await cloud.database().collection('categories').get()
 
-        assert.ok(res.data instanceof Array)
-    })
+    assert.ok(res.data instanceof Array)
+  })
 })
