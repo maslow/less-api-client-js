@@ -6,6 +6,7 @@
     "allowUnusedLabels": false,
     "charset": "utf8",
     "declaration": true,
+    "declarationMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "importHelpers": false,

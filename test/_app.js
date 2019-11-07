@@ -1,5 +1,5 @@
 const express = require('express')
-const { Entry } = require('less-api')
+const { Entry, MongoAccessor } = require('less-api')
 
 const rules = {
   categories: {
@@ -13,32 +13,28 @@ const rules = {
 const app = new express()
 app.use(express.json())
 
-function parseToken(token){
+function parseToken(){
   return {
     role: 'admin',
     userId: 123
   }
 }
 
-// @see https://mongodb.github.io/node-mongodb-native/3.3/reference/ecmascriptnext/connecting/
-const db = {
-  dbName: 'mydb',
-  url: 'mongodb://localhost:27017',
-  connSettings: {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    poolSize: 10
-  }
+// init the less-api Entry & Db Accessor
+const dbOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 }
-const entry = new Entry({ db })
+const accessor = new MongoAccessor('mydb', 'mongodb://localhost:27017', dbOptions)
+const entry = new Entry(accessor)
 entry.init()
 entry.loadRules(rules)
 
 app.post('/entry', async (req, res) => {
-  const { role, userId } = parseToken(req.headers['Authorization'])
+  const { role, userId } = parseToken(req.headers['authorization'])
 
+  // parse params
   const { action } = req.body
-
   const params = entry.parseParams(action, req.body)
 
   const injections = {
@@ -46,14 +42,16 @@ app.post('/entry', async (req, res) => {
     $userid: userId
   } 
 
-  const [error, matched] = await entry.validate({ ...params, injections })
-  if (error) {
+  // validate query
+  const result = await entry.validate(params, injections)
+  if (result.errors) {
     return res.send({
       code: 1,
-      data: error
+      data: errors
     })
   }
 
+  // execute query
   const data = await entry.execute(params)
   return res.send({
     code: 0,

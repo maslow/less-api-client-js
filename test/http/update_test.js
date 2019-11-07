@@ -19,7 +19,8 @@ describe('Database', function () {
       .collection('categories')
       .add({
         title: 'title-update-666',
-        content: 'content-update-666'
+        content: 'content-update-666',
+        age: 0
       })
 
     assert.ok(result.id)
@@ -41,5 +42,29 @@ describe('Database', function () {
 
     assert.equal(data[0]._id, result.id)
     assert.equal(data[0].title, 'updated-title')
+  })
+
+  it('update with $operator should be ok', async () => {
+    const db = cloud.database()
+    const _ = db.command
+    
+    const updated = await db.collection('categories')
+      .doc(result.id)
+      .update({
+        title: 'updated-title',
+        age: _.inc(1),
+        content: _.remove()
+      })
+       
+    const { data } = await cloud.database()
+      .collection('categories')
+      .doc(result.id)
+      .get()
+
+
+    assert.equal(data[0]._id, result.id)
+    assert.equal(data[0].title, 'updated-title')
+    assert.equal(data[0].age, 1)
+    assert.equal(data[0].content, undefined)
   })
 })
