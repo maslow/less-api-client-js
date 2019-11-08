@@ -1,5 +1,5 @@
 
-import { Db } from './database'
+import { Db } from '@cloudbase/database'
 import { Request } from './request'
 
 interface Config {

@@ -26,12 +26,7 @@
   },
   "homepage": "https://github.com/Maslow/less-api-client-js#readme",
   "dependencies": {
-    "axios": "^0.19.0",
-    "bson": "^4.0.2",
-    "camelcase": "^5.3.1",
-    "lodash": "^4.17.15",
-    "node-cache": "^4.2.0",
-    "superagent": "^5.1.0",
+    "@cloudbase/database": "^0.9.2",
     "ws": "^7.0.0"
   },
   "devDependencies": {
@@ -40,7 +35,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-typescript": "^0.14.0",
     "express": "^4.17.1",
-    "less-api": "^0.1.6",
+    "less-api": "^0.1.7",
     "mocha": "^6.2.0",
     "typescript": "^3.6.2",
     "typescript-eslint-parser": "^22.0.0"
