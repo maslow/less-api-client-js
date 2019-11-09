@@ -1,7 +1,7 @@
 const assert = require('assert')
 const client = require('../../dist/commonjs/index')
-const Db = require('@cloudbase/database').Db
 const { Request } = require('../../dist/commonjs/request')
+const Db = client.Db
 
 function getAccessToken(){
   return 'test-token-xxx'

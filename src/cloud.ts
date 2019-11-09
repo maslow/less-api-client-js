@@ -28,5 +28,6 @@ class Cloud {
 
 export {
   Cloud,
-  Config
+  Config,
+  Db
 }
