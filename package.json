@@ -5,7 +5,7 @@
   "main": "dist/commonjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
-    "test": "mocha tests/*/*test.js",
+    "test": "mocha tests/units/*test.js",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.esm.json",
     "eslint": "eslint \"./**/*.ts\"",
     "fix": "eslint --fix \"./**/*.ts\"",
@@ -27,8 +27,7 @@
   "homepage": "https://github.com/Maslow/less-api-client-js#readme",
   "dependencies": {
     "@cloudbase/database": "^0.9.2",
-    "axios": "^0.19.0",
-    "ws": "^7.0.0"
+    "axios": "^0.19.0"
   },
   "devDependencies": {
     "eslint": "^5.15.3",
