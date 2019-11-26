@@ -1,4 +1,4 @@
-import { Cloud, Config, Db } from './cloud'
+import { Cloud, Config, Db, EnvironmentType } from './cloud'
 
 function init(config: Config): Cloud {
   return new Cloud(config)
@@ -7,5 +7,6 @@ function init(config: Config): Cloud {
 export {
   init,
   Cloud,
-  Db
+  Db,
+  EnvironmentType
 }

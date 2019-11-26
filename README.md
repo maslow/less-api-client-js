@@ -53,6 +53,26 @@ const created = await db.collection('articles').add({
 const removed = await db.collection('articles').doc('the-doc-id').remove()
 ```
 
+#### 微信小程序中使用
+
+```js
+const cloud = require('less-api-client').init({
+    entryUrl: 'http://localhost:8080/entry',
+    getAccessToken: () => localStorage.getItem('access_token'),
+    environment: 'wxmp'
+})
+```
+
+#### UNI-APP 中使用
+
+```js
+const cloud = require('less-api-client').init({
+    entryUrl: 'http://localhost:8080/entry',
+    getAccessToken: () => localStorage.getItem('access_token'),
+    environment: 'uniapp'
+})
+```
+
 ### 数据库操作
 
 客户端数据操作采取了[腾讯云云开发的接口](https://github.com/TencentCloudBase/tcb-js-sdk/blob/master/docs/database.md)设计。

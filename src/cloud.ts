@@ -2,10 +2,16 @@
 import { Db } from '@cloudbase/database'
 import { Request } from './request'
 
+export enum EnvironmentType{
+  H5 = 'h5',
+  WX_MP = 'wxmp',
+  UNI_APP = 'uniapp'
+}
 interface Config {
     entryUrl: string,
     getAccessToken: Function,
-    timeout?: number
+    timeout?: number,
+    environment?: EnvironmentType
 }
 
 class Cloud {
@@ -14,7 +20,8 @@ class Cloud {
       this.config = {
         entryUrl: config.entryUrl,
         getAccessToken: config.getAccessToken,
-        timeout: config.timeout || 15000
+        timeout: config.timeout || 15000,
+        environment: config.environment || EnvironmentType.H5
       }
     }
   
