@@ -57,13 +57,13 @@ export class Request {
     return res.data
   }
 
-  async request_wxmp(data: any){
+  async request_wxmp(data: any) {
     const token = this.config.getAccessToken()
     const header = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     }
-    const options = { 
+    const options = {
       url: this.config.entryUrl,
       header,
       method: 'POST',
@@ -71,17 +71,26 @@ export class Request {
       dataType: 'json'
     }
 
-    const res = await wx.request(options)
-    return res.data
+    return new Promise((resolve, reject) => {
+      wx.request({
+        ...options,
+        success(res) {
+          resolve(res.data)
+        },
+        fail(err) {
+          reject(err)
+        }
+      })
+    })
   }
 
-  async request_uniapp(data: any){
+  async request_uniapp(data: any) {
     const token = this.config.getAccessToken()
     const header = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     }
-    const options = { 
+    const options = {
       url: this.config.entryUrl,
       header,
       method: 'POST',
@@ -89,7 +98,13 @@ export class Request {
       dataType: 'json'
     }
 
-    const res = await uni.request(options)
+    const [err, res] = await uni.request(options);
+    if (err) {
+      return {
+        code: 1,
+        data: err
+      }
+    }
     return res.data
   }
 }
