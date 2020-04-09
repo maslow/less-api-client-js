@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/Maslow/less-api-client-js#readme",
   "dependencies": {
-    "@cloudbase/database": "^0.5.0",
+    "@cloudbase/database": "^0.9.10",
     "axios": "^0.19.0"
   },
   "devDependencies": {
