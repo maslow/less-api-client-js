@@ -13,12 +13,6 @@ const rules = {
 const app = new express()
 app.use(express.json())
 
-function parseToken(){
-  return {
-    role: 'admin',
-    userId: 123
-  }
-}
 
 // init the less-api Entry & Db Accessor
 const dbOptions = {
@@ -34,8 +28,7 @@ app.post('/entry', async (req, res) => {
   const { role, userId } = parseToken(req.headers['authorization'])
 
   // parse params
-  const { action } = req.body
-  const params = entry.parseParams(action, req.body)
+  const params = entry.parseParams(req.body)
 
   const injections = {
     $role: role,
@@ -60,3 +53,11 @@ app.post('/entry', async (req, res) => {
 })
 
 app.listen(8080, () => console.log('listening on 8080'))
+
+
+function parseToken(){
+  return {
+    role: 'admin',
+    userId: 123
+  }
+}
