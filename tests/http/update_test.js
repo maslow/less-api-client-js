@@ -67,4 +67,41 @@ describe('Database', function () {
     assert.equal(data[0].age, 1)
     assert.equal(data[0].content, undefined)
   })
+
+  it('update many should be ok', async () => {
+    const db = cloud.database()
+    const _ = db.command
+    
+    const updated = await db.collection('categories')
+      .where({})
+      .update({
+        updatedField: 'content-add-3'
+      })
+       
+    const { data } = await cloud.database()
+      .collection('categories')
+      .get()
+      data.forEach( d => {
+          assert.equal(d.updatedField, 'content-add-3')
+      })
+  })
+
+  it('set one shouWld be ok', async () => {
+    const db = cloud.database()
+    const _ = db.command
+    
+    const updated = await db.collection('categories')
+      .doc(result.id)
+      .set({
+        setField: 'content-set-1'
+      })
+       
+    const { data } = await cloud.database()
+      .collection('categories')
+      .doc(result.id)
+      .get()
+      
+      assert.equal(data[0]._id, result.id)
+      assert.equal(data[0].setField, 'content-set-1')
+  })
 })
