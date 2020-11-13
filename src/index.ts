@@ -10,3 +10,12 @@ export {
   Db,
   EnvironmentType
 }
+
+if (window) {
+  window['LessApiClient'] = {
+    init,
+    Cloud,
+    Db,
+    EnvironmentType
+  }
+}
