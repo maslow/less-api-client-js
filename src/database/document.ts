@@ -4,9 +4,15 @@ import { Util } from './util'
 import { UpdateSerializer } from './serializer/update'
 import { serialize } from './serializer/datatype'
 import { UpdateCommand } from './commands/update'
-import { IWatchOptions, DBRealtimeListener } from './typings/index'
-import { RealtimeWebSocketClient } from './realtime/websocket-client'
 import { QueryType } from './constant'
+
+interface GetRes {
+  data: any[]
+  requestId: string
+  total: number
+  limit: number
+  offset: number
+}
 
 /**
  * 文档模块
@@ -69,7 +75,7 @@ export class DocumentReference {
    * @param data - 文档数据
    * @internal
    */
-  create(data: any, callback?: any): Promise<any> {
+  create(data: any, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string }> {
     callback = callback || createPromiseCallback()
 
     let params = {
@@ -90,6 +96,7 @@ export class DocumentReference {
         } else {
           callback(0, {
             id: res.data._id,
+            insertedCount: res.data.insertedCount,
             requestId: res.requestId
           })
         }
@@ -109,7 +116,7 @@ export class DocumentReference {
    *
    * @param data - 文档数据
    */
-  set(data: Object, callback?: any): Promise<any> {
+  set(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string } | { code: string, message: string }> {
     callback = callback || createPromiseCallback()
 
     if (!this.id) {
@@ -178,6 +185,7 @@ export class DocumentReference {
         } else {
           callback(0, {
             updated: res.data.updated,
+            matched: res.data.matched,
             upsertedId: res.data.upserted_id,
             requestId: res.requestId
           })
@@ -195,7 +203,7 @@ export class DocumentReference {
    *
    * @param data - 文档数据
    */
-  update(data: Object, callback?: any) {
+  update(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string } | { code: string, message: string }> {
     callback = callback || createPromiseCallback()
 
     if (!data || typeof data !== 'object') {
@@ -233,6 +241,7 @@ export class DocumentReference {
         } else {
           callback(0, {
             updated: res.data.updated,
+            matched: res.data.matched,
             upsertedId: res.data.upserted_id,
             requestId: res.requestId
           })
@@ -248,7 +257,7 @@ export class DocumentReference {
   /**
    * 删除文档
    */
-  remove(callback?: any): Promise<any> {
+  remove(callback?: any): Promise<{ deleted: number, requestId: string }> {
     callback = callback || createPromiseCallback()
 
     const query = { _id: this.id }
@@ -281,7 +290,7 @@ export class DocumentReference {
   /**
    * 返回选中的文档（_id）
    */
-  get(callback?: any): Promise<any> {
+  get(callback?: any): Promise<GetRes> {
     callback = callback || createPromiseCallback()
 
     const query = { _id: this.id }
@@ -327,33 +336,5 @@ export class DocumentReference {
       }
     }
     return new DocumentReference(this._db, this._coll, this.id, projection)
-  }
-
-  /**
-   * 监听单个文档
-   */
-  watch = (options: IWatchOptions): DBRealtimeListener => {
-    if (!Db.ws) {
-      Db.ws = new RealtimeWebSocketClient({
-        context: {
-          appConfig: {
-            docSizeLimit: 1000,
-            realtimePingInterval: 10000,
-            realtimePongWaitTimeout: 5000,
-            request: this.request
-          }
-        }
-      })
-    }
-
-    return (Db.ws as RealtimeWebSocketClient).watch({
-      ...options,
-      envId: this._db.config.env,
-      collectionName: this._coll,
-      query: JSON.stringify({
-        _id: this.id
-      })
-    })
-    // })
   }
 }

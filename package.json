@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/Maslow/less-api-client-js#readme",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "bson": "^4.0.2",
     "lodash.clonedeep": "4.5.0",
     "lodash.set": "4.3.2",
@@ -41,7 +41,7 @@
     "eslint-plugin-typescript": "^0.14.0",
     "express": "^4.17.1",
     "html-webpack-plugin": "^4.3.0",
-    "less-api": "^1.0.0",
+    "less-api": "^1.1.0",
     "mocha": "^7.1.1",
     "ts-loader": "^7.0.5",
     "typescript": "^3.6.2",

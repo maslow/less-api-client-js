@@ -1,16 +1,10 @@
 import { createPromiseCallback } from './lib/util'
-/* eslint-disable no-unused-vars */
 import { OrderByDirection, QueryType } from './constant'
 import { Db } from './index'
 import { Validate } from './validate'
 import { Util } from './util'
-// import { Command } from './command';
-// import * as isRegExp from 'is-regex'
 import { QuerySerializer } from './serializer/query'
 import { UpdateSerializer } from './serializer/update'
-// import { WSClient } from "./websocket/wsclient"
-import { IWatchOptions, DBRealtimeListener } from './typings/index'
-import { RealtimeWebSocketClient } from './realtime/websocket-client'
 import { ErrorCode } from './constant'
 
 interface GetRes {
@@ -34,11 +28,6 @@ interface QueryOption {
   // 指定显示或者不显示哪些字段
   projection?: Object
 }
-
-// interface CallbackObj {
-//   success: (event: any) => void
-//   fail: (err: any) => void
-// }
 
 /**
  * 查询模块
@@ -94,26 +83,6 @@ export class Query {
   private _request: any
 
   /**
-   * websocket 参数 pingTimeout
-   */
-  // private _pingTimeout: number
-
-  /**
-   * websocket 参数 pongTimeout
-   */
-  // private _pongTimeout: number
-
-  /**
-   * websocket 参数 reconnectTimeout
-   */
-  // private _reconnectTimeout: number
-
-  /**
-   * websocket 参数 wsURL
-   */
-  // private _wsURL: string
-
-  /**
    * 初始化
    *
    * @internal
@@ -137,11 +106,6 @@ export class Query {
     this._fieldFilters = fieldFilters
     this._fieldOrders = fieldOrders || []
     this._queryOptions = queryOptions || {}
-    // this._pingTimeout = 10000
-    // this._pongTimeout = 5000
-    // this._reconnectTimeout = 15000
-    // this._rawWhereParams = rawWhereParams || {}
-    // this._wsURL = "ws://localhost:3000"
 
     /* eslint-disable new-cap */
     this._request = new Db.reqClass(this._db.config)
@@ -220,7 +184,7 @@ export class Query {
   /**
    * 获取总数
    */
-  public count(callback?: any) {
+  public count(callback?: any): Promise<{ total: number, requestId: string }> {
     callback = callback || createPromiseCallback()
 
     interface Param {
@@ -331,7 +295,7 @@ export class Query {
    *
    * @param data 数据
    */
-  public update(data: Object, callback?: any): Promise<any> {
+  public update(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string } | { code: string, message: string }> {
     callback = callback || createPromiseCallback()
 
     if (!data || typeof data !== 'object') {
@@ -401,7 +365,7 @@ export class Query {
   /**
    * 条件删除文档
    */
-  public remove(callback?: any) {
+  public remove(callback?: any): Promise<{ deleted: number, requestId: string }> {
     callback = callback || createPromiseCallback()
 
     if (Object.keys(this._queryOptions).length > 0) {
@@ -429,76 +393,4 @@ export class Query {
 
     return callback.promise
   }
-
-  /**
-   * 监听query对应的doc变化
-   */
-  watch = (options: IWatchOptions): DBRealtimeListener => {
-    if (!Db.ws) {
-      Db.ws = new RealtimeWebSocketClient({
-        context: {
-          appConfig: {
-            docSizeLimit: 1000,
-            realtimePingInterval: 10000,
-            realtimePongWaitTimeout: 5000,
-            request: this._request
-          }
-        }
-      })
-    }
-
-    return (Db.ws as RealtimeWebSocketClient).watch({
-      ...options,
-      envId: this._db.config.env,
-      collectionName: this._coll,
-      query: JSON.stringify(this._fieldFilters),
-      limit: this._queryOptions.limit,
-      orderBy: this._fieldOrders
-        ? this._fieldOrders.reduce<Record<string, string>>((acc, cur) => {
-            acc[cur.field] = cur.direction
-            return acc
-          }, {})
-        : undefined
-    })
-    // })
-  }
-
-  /*
-  convertParams(query: object) {
-    // console.log(JSON.stringify(query));
-    let queryParam = {};
-    if (query instanceof Command) {
-      queryParam = query.parse();
-    } else {
-      for (let key in query) {
-        if (query[key] instanceof Command || query[key] instanceof RegExp || query[key] instanceof Point) {
-          queryParam = Object.assign({}, queryParam, query[key].parse(key));
-        } else if (isRegExp(query[key])) {
-          queryParam = {
-            [key]: {
-              $regex: query[key].source,
-              $options: query[key].flags
-            }
-          };
-        } else if (typeof query[key] === 'object') {
-          let command = new Command();
-          let tmp = {};
-          command.concatKeys({ [key]: query[key] }, ', tmp);
-          let keys = Object.keys(tmp)[0];
-          let value = tmp[keys];
-          if (value instanceof Command) {
-            value = value.parse(keys);
-          } else {
-            value = { [keys]: value };
-          }
-
-          queryParam = Object.assign({}, queryParam, value);
-        } else {
-          queryParam = Object.assign({}, queryParam, { [key]: query[key] });
-        }
-      }
-    }
-    // console.log(JSON.stringify(queryParam));
-    return queryParam;
-  } */
 }

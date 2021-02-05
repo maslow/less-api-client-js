@@ -1,20 +1,16 @@
-import { Point } from './geo/point'
-import * as Geo from './geo/index'
+// import { Point } from './geo/point'
+// import * as Geo from './geo/index'
 import { CollectionReference } from './collection'
 import { Command } from './command'
-import { ServerDateConstructor } from './serverDate/index'
-import { RegExpConstructor } from './regexp/index'
-import { startTransaction, runTransaction } from './transaction/index'
-import { LogicCommand } from './commands/logic'
-import { QueryCommand } from './commands/query'
-import { UpdateCommand } from './commands/update'
+// import { ServerDateConstructor } from './serverDate/index'
+// import { RegExpConstructor } from './regexp/index'
 
 /**
  * 地理位置类型
- */
-interface GeoTeyp {
-  Point: typeof Point
-}
+//  */
+// interface GeoTeyp {
+//   Point: typeof Point
+// }
 
 export { Query } from './query'
 export { CollectionReference } from './collection'
@@ -29,26 +25,16 @@ export class Db {
   /**
    * Geo 类型
    */
-  Geo: GeoTeyp
+  // Geo: GeoTeyp
 
   /**
    * 逻辑操作的命令
    */
   command: typeof Command
 
-  RegExp: any
+  // RegExp: any
 
-  serverDate: any
-
-  startTransaction: any
-
-  runTransaction: any
-
-  logicCommand: any
-
-  updateCommand: any
-
-  queryCommand: any
+  // serverDate: any
 
   /**
    * 初始化
@@ -59,36 +45,15 @@ export class Db {
    */
   config: any
 
-  static ws: any
-
   static reqClass: any
 
-  static wsClass: any
-
-  // 创建签名的工具函数，由jssdk传入
-  static createSign: Function
-
   static getAccessToken: Function
-  // 由jssdk传入
-  static dataVersion: string
-  // 运行环境，由jssdk传入
-  static runtime: string
-  // 应用签名信息，由jssdk传入
-  static appSecretInfo: any
 
   constructor(config?: any) {
     this.config = config
-    this.Geo = Geo
-    this.serverDate = ServerDateConstructor
+    // this.Geo = Geo
+    // this.serverDate = ServerDateConstructor
     this.command = Command
-    this.RegExp = RegExpConstructor
-    this.startTransaction = startTransaction
-    this.runTransaction = runTransaction
-
-    // 暴露command类 给新sdk灰度兼容用
-    this.logicCommand = LogicCommand
-    this.updateCommand = UpdateCommand
-    this.queryCommand = QueryCommand
   }
 
   /**
