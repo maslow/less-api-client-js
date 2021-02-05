@@ -27,8 +27,11 @@
   },
   "homepage": "https://github.com/Maslow/less-api-client-js#readme",
   "dependencies": {
-    "@cloudbase/database": "^0.9.10",
-    "axios": "^0.19.0"
+    "axios": "^0.19.0",
+    "bson": "^4.0.2",
+    "lodash.clonedeep": "4.5.0",
+    "lodash.set": "4.3.2",
+    "lodash.unset": "4.5.2"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",

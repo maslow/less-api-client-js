@@ -1,5 +1,5 @@
 
-import { Db } from '@cloudbase/database'
+import { Db } from './database'
 import { Request } from './request'
 
 export enum EnvironmentType{

@@ -1,5 +1,6 @@
 const express = require('express')
 const { Entry, MongoAccessor } = require('less-api')
+const util = require('util')
 
 const rules = {
   categories: {
@@ -27,8 +28,10 @@ entry.loadRules(rules)
 app.post('/entry', async (req, res) => {
   const { role, userId } = parseToken(req.headers['authorization'])
 
+  console.log({body: req.body})
   // parse params
   const params = entry.parseParams(req.body)
+  console.log(util.inspect(params, false, null, true /* enable colors */))
 
   const injections = {
     $role: role,
@@ -55,7 +58,8 @@ app.post('/entry', async (req, res) => {
 app.listen(8080, () => console.log('listening on 8080'))
 
 
-function parseToken(){
+/* eslint-disable no-unused-vars */
+function parseToken(_token) {
   return {
     role: 'admin',
     userId: 123
