@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 const assert = require('assert')
 const client = require('../../dist/commonjs/index')
 

@@ -74,6 +74,10 @@ export const Command = {
     return new QueryCommand(QUERY_COMMANDS_LITERAL.GEO_INTERSECTS, [val])
   },
 
+  like(val: string) {
+    return new QueryCommand(QUERY_COMMANDS_LITERAL.LIKE, [val])
+  },
+
   and(...__expressions__: IQueryCondition[]) {
     const expressions = isArray(arguments[0]) ? arguments[0] : Array.from(arguments)
     return new LogicCommand(LOGIC_COMMANDS_LITERAL.AND, expressions)
@@ -183,10 +187,10 @@ export const Command = {
   },
 
   text(values: string | {
-    search: string;
-    language?: string;
-    caseSensitive?: boolean;
-    diacriticSensitive: boolean;
+    search: string
+    language?: string
+    caseSensitive?: boolean
+    diacriticSensitive: boolean
   }) {
     if (isString(values)) {
       return {

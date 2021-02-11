@@ -16,6 +16,7 @@ export const ELEM_MATCH = 'elemMatch'
 export const EXISTS = 'exists'
 export const SIZE = 'size'
 export const MOD = 'mod'
+export const LIKE = 'like'
 
 export enum QUERY_COMMANDS_LITERAL {
   EQ = 'eq',
@@ -33,7 +34,8 @@ export enum QUERY_COMMANDS_LITERAL {
   MOD = 'mod',
   GEO_NEAR = 'geoNear',
   GEO_WITHIN = 'geoWithin',
-  GEO_INTERSECTS = 'geoIntersects'
+  GEO_INTERSECTS = 'geoIntersects',
+  LIKE = 'like'
 }
 
 export class QueryCommand extends LogicCommand {

@@ -18,4 +18,17 @@ describe('Database', function () {
 
     assert.ok(res.data instanceof Array)
   })
+
+
+  // only for sql
+  // it('read with $like should be ok', async () => {
+  //   const cloud = client.init(config)
+  //   const db = cloud.database()
+  //   const _ = db.command
+  //   const res = await db.collection('categories')
+  //     .where({ f1: _.like('ok%')}).get()
+
+  //   assert.ok(res.data instanceof Array)
+  // })
 })
+

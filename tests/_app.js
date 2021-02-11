@@ -28,7 +28,7 @@ entry.loadRules(rules)
 app.post('/entry', async (req, res) => {
   const { role, userId } = parseToken(req.headers['authorization'])
 
-  console.log({body: req.body})
+  // console.log({body: req.body})
   // parse params
   const params = entry.parseParams(req.body)
   console.log(util.inspect(params, false, null, true /* enable colors */))
