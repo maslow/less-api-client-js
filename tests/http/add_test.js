@@ -7,7 +7,7 @@ function getAccessToken(){
 
 const config = {
   entryUrl: 'http://localhost:8080/entry',
-  getAccessToken
+  getAccessToken,
 }
 
 describe('Database', function () {

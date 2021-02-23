@@ -45,13 +45,12 @@ export class Request {
 
   async request_h5(data: any) {
     const token = this.config.getAccessToken()
+    const headers = this.getHeaders(token)
+
     const res = await request
       .post(this.config.entryUrl, data, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        timeout: this.config.timeout
+        headers,
+        timeout: this.config.timeout,
       })
 
     return res.data
@@ -59,10 +58,8 @@ export class Request {
 
   async request_wxmp(data: any) {
     const token = this.config.getAccessToken()
-    const header = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+    const header = this.getHeaders(token)
+
     const options = {
       url: this.config.entryUrl,
       header,
@@ -86,10 +83,7 @@ export class Request {
 
   async request_uniapp(data: any) {
     const token = this.config.getAccessToken()
-    const header = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+    const header = this.getHeaders(token)
     const options = {
       url: this.config.entryUrl,
       header,
@@ -98,7 +92,7 @@ export class Request {
       dataType: 'json'
     }
 
-    const [err, res] = await uni.request(options);
+    const [err, res] = await uni.request(options)
     if (err) {
       return {
         code: 1,
@@ -106,5 +100,14 @@ export class Request {
       }
     }
     return res.data
+  }
+
+  private getHeaders(token) {
+    const header = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }
+    const optionHeader = this.config?.requestOptions?.headers || {}
+    return Object.assign(header, optionHeader)
   }
 }
