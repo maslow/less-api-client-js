@@ -29,6 +29,22 @@ interface QueryOption {
   projection?: Object
 }
 
+// left, right, inner, full
+enum JoinType {
+  INNER = 'inner',
+  LEFT = 'left',
+  RIGHT = 'right',
+  FULL = 'full'
+}
+
+interface JoinParam {
+  collection: string,
+  type: JoinType,
+  leftKey: string,
+  rightKey: string
+}
+
+
 /**
  * 查询模块
  *
@@ -71,6 +87,13 @@ export class Query {
   private _queryOptions: QueryOption
 
   /**
+   * 联表条件(join)
+   * 
+   * @internal
+   */
+  private _joins: JoinParam[]
+
+  /**
    * 原始过滤参数
    */
   // private _rawWhereParams: Object
@@ -98,7 +121,8 @@ export class Query {
     coll: string,
     fieldFilters?: Object,
     fieldOrders?: QueryOrder[],
-    queryOptions?: QueryOption
+    queryOptions?: QueryOption,
+    joins?: JoinParam[]
     // rawWhereParams?: Object
   ) {
     this._db = db
@@ -106,7 +130,7 @@ export class Query {
     this._fieldFilters = fieldFilters
     this._fieldOrders = fieldOrders || []
     this._queryOptions = queryOptions || {}
-
+    this._joins = joins || []
     /* eslint-disable new-cap */
     this._request = new Db.reqClass(this._db.config)
   }
@@ -134,7 +158,8 @@ export class Query {
       order?: string[]
       offset?: number
       limit?: number
-      projection?: Object
+      projection?: Object,
+      joins?: JoinParam[]
     }
     let param: Param = {
       collectionName: this._coll,
@@ -156,6 +181,9 @@ export class Query {
     }
     if (this._queryOptions.projection) {
       param.projection = this._queryOptions.projection
+    }
+    if (this._joins.length) {
+      param.joins = this._joins
     }
     this._request
       .send('database.queryDocument', param)
@@ -239,7 +267,8 @@ export class Query {
       this._coll,
       QuerySerializer.encode(query),
       this._fieldOrders,
-      this._queryOptions
+      this._queryOptions,
+      this._joins
     )
   }
 
@@ -259,7 +288,66 @@ export class Query {
     }
     const combinedOrders = this._fieldOrders.concat(newOrder)
 
-    return new Query(this._db, this._coll, this._fieldFilters, combinedOrders, this._queryOptions)
+    return new Query(this._db, this._coll, this._fieldFilters, combinedOrders, this._queryOptions, this._joins)
+  }
+
+  /**
+   * 添加联表条件
+   * @param type 联接类型, 以下值之一 "left", "inner", "right", "full"
+   * @param collection 联接的子表名
+   * @param rightKey 子表的联接键名
+   * @param leftKey 主表的联接键名
+   */
+  public join(collection: string, rightKey: string, leftKey: string, type: JoinType = JoinType.INNER): Query {
+    const newJoin: JoinParam = {
+      type,
+      collection,
+      rightKey,
+      leftKey
+    }
+
+    const combinedJoins = this._joins.concat(newJoin)
+    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, this._queryOptions, combinedJoins)
+  }
+
+  /**
+   * 添加 left join 联表条件
+   * @param collection 联接的子表名
+   * @param rightKey 子表的联接键名
+   * @param leftKey 主表的联接键名
+   */
+  public leftJoin(collection: string, rightKey: string, leftKey: string) {
+    return this.join(collection, rightKey, leftKey, JoinType.LEFT)
+  }
+
+  /**
+   * 添加 right join 联表条件
+   * @param collection 联接的子表名
+   * @param rightKey 子表的联接键名
+   * @param leftKey 主表的联接键名
+   */
+  public rightJoin(collection: string, rightKey: string, leftKey: string) {
+    return this.join(collection, rightKey, leftKey, JoinType.RIGHT)
+  }
+
+  /**
+   * 添加 full join 联表条件
+   * @param collection 联接的子表名
+   * @param rightKey 子表的联接键名
+   * @param leftKey 主表的联接键名
+   */
+  public fullJoin(collection: string, rightKey: string, leftKey: string) {
+    return this.join(collection, rightKey, leftKey, JoinType.FULL)
+  }
+
+  /**
+   * 添加 inner join 联表条件
+   * @param collection 联接的子表名
+   * @param rightKey 子表的联接键名
+   * @param leftKey 主表的联接键名
+   */
+  public innerJoin(collection: string, rightKey: string, leftKey: string) {
+    return this.join(collection, rightKey, leftKey, JoinType.INNER)
   }
 
   /**
@@ -273,7 +361,7 @@ export class Query {
     let option = { ...this._queryOptions }
     option.limit = limit
 
-    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, option)
+    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, option, this._joins)
   }
 
   /**
@@ -287,7 +375,7 @@ export class Query {
     let option = { ...this._queryOptions }
     option.offset = offset
 
-    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, option)
+    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, option, this._joins)
   }
 
   /**
@@ -343,23 +431,32 @@ export class Query {
   /**
    * 指定要返回的字段
    *
-   * @param projection
+   * @param projection string[] | {[fieldName]: true | false}
    */
-  public field(projection: any): Query {
-    for (let k in projection) {
-      if (projection[k]) {
-        if (typeof projection[k] !== 'object') {
-          projection[k] = 1
+  public field(projection: string[] | any): Query {
+    if (projection instanceof Array) {
+      let result = {}
+      for (let k of projection) {
+        result[k] = 1
+      }
+      projection = result
+    } else {
+      for (let k in projection) {
+        if (projection[k]) {
+          if (typeof projection[k] !== 'object') {
+            projection[k] = 1
+          }
+        } else {
+          projection[k] = 0
         }
-      } else {
-        projection[k] = 0
       }
     }
+
 
     let option = { ...this._queryOptions }
     option.projection = projection
 
-    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, option)
+    return new Query(this._db, this._coll, this._fieldFilters, this._fieldOrders, option, this._joins)
   }
 
   /**

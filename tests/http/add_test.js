@@ -21,6 +21,7 @@ describe('Database', function () {
         content: 'content-add-2'
       })
 
+    console.log({result})
     const {data} = await cloud.database()
       .collection('categories')
       .doc(result.id)
