@@ -44,4 +44,23 @@ describe('Database sql', function () {
 
     assert.ok(result.id)
   })
+
+  it('add many categories should be rejected', async () => {
+    const cloud = client.init(config)
+
+    const res = await cloud.database()
+      .collection('categories')
+      .add([
+        {
+          name: 'category-add'
+        },
+        {
+          name: 'category-add-2'
+        }
+      ], { multi: true })
+
+    assert.ok(res.error?.length)
+    assert.strictEqual(res.error[0].type, 'multi')
+    assert.strictEqual(res.error[0].error, 'multi operation denied')
+  })
 })

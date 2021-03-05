@@ -2,13 +2,13 @@
 const assert = require('assert')
 const client = require('../../dist/commonjs/index')
 
-const config = {
+const cloud = client.init({
   entryUrl: 'http://localhost:8088/entry',
-  getAccessToken: () => ''
-}
+  getAccessToken: () => '',
+  primaryKey: 'id'
+})
 
 describe('Database sql', function () {
-  const cloud = client.init(config)
 
   let result = null
   before(async () => {
@@ -22,81 +22,55 @@ describe('Database sql', function () {
   })
 
   it('update one should be ok', async () => {
-        
-    const updated = await cloud.database()
-      .collection('categories')
-      .doc(result.id)
-      .update({
-        title: 'updated-title'
-      })
-       
-    const { data } = await cloud.database()
-      .collection('categories')
-      .doc(result.id)
-      .get()
-
-    assert.equal(data[0]._id, result.id)
-    assert.equal(data[0].title, 'updated-title')
-  })
-
-  it('update with $operator should be ok', async () => {
     const db = cloud.database()
-    const _ = db.command
-    
-    const updated = await db.collection('categories')
+        
+    const updated = await db
+      .collection('categories')
       .doc(result.id)
       .update({
-        title: 'updated-title',
-        age: _.inc(1),
-        content: _.remove()
+        name: 'updated-title'
       })
        
+    assert.ok(updated.ok)
     const { data } = await cloud.database()
       .collection('categories')
       .doc(result.id)
       .get()
 
-
-    assert.equal(data[0]._id, result.id)
-    assert.equal(data[0].title, 'updated-title')
-    assert.equal(data[0].age, 1)
-    assert.equal(data[0].content, undefined)
+    assert.equal(data[0].id, result.id)
+    assert.equal(data[0].name, 'updated-title')
   })
 
   it('update many should be ok', async () => {
     const db = cloud.database()
-    const _ = db.command
     
     const updated = await db.collection('categories')
       .where({})
       .update({
-        updatedField: 'content-add-3'
-      })
-       
-    const { data } = await cloud.database()
+        name: 'content-update-many'
+      }, { multi: true})
+      
+    assert.ok(updated.ok)
+    const res = await cloud.database()
       .collection('categories')
       .get()
-      data.forEach( d => {
-          assert.equal(d.updatedField, 'content-add-3')
-      })
+    
+    res?.data?.forEach( d => {
+        assert.strictEqual(d.name, 'content-update-many')
+    })
   })
 
-  it('set one shouWld be ok', async () => {
+  it('set one shouWld be rejected since merge = true forbidden in sql', async () => {
     const db = cloud.database()
-    const _ = db.command
     
-    const updated = await db.collection('categories')
+    const res = await db.collection('categories')
       .doc(result.id)
       .set({
         setField: 'content-set-1'
       })
-       
-    const { data } = await cloud.database()
-      .collection('categories')
-      .doc(result.id)
-      .get()
-      
-      assert.equal(data[0]._id, result.id)
-      assert.equal(data[0].setField, 'content-set-1')
+    
+    assert.ok(res.code > 0)
+    assert.ok(res.error)
+    assert.ok(res.error, 'AssertionError [ERR_ASSERTION]: invalid params: {merge} should be true in sql')
   })
 })

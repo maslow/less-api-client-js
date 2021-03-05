@@ -79,13 +79,19 @@ export class DocumentReference {
    * @param data - 文档数据
    * @internal
    */
-  create(data: any, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string, ok: boolean }> {
+  create(data: any, options?: { multi: boolean }, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string, ok: boolean }> {
     callback = callback || createPromiseCallback()
+    if (!options) {
+      options = { multi: false }
+    } else {
+      options.multi = options.multi ?? false
+    }
 
     let params = {
       collectionName: this._coll,
       // data: Util.encodeDocumentDataForReq(data, false, false)
-      data: serialize(data)
+      data: serialize(data),
+      multi: options.multi
     }
 
     if (this.id) {

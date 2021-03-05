@@ -1,7 +1,10 @@
 {
   "categories": {
     ".read": true,
-    ".update": true,
+    ".update": {
+      "condition": true,
+      "multi": true
+    },
     ".add": true,
     ".remove": true,
     ".count": true

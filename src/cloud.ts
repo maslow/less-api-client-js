@@ -18,7 +18,8 @@ interface Config {
   getAccessToken?: Function,
   timeout?: number,
   environment?: EnvironmentType,
-  requestOptions?: RequestOptions
+  requestOptions?: RequestOptions,
+  primaryKey?: string // mongo 主键为 '_id', 使用 mysql 时可将此键设为 id
 }
 
 class Cloud {
@@ -36,7 +37,8 @@ class Cloud {
       getAccessToken: config?.getAccessToken || warningFunc,
       timeout,
       environment: config?.environment || EnvironmentType.H5,
-      requestOptions: config?.requestOptions || {}
+      requestOptions: config?.requestOptions || {},
+      primaryKey: config?.primaryKey
     }
   }
 

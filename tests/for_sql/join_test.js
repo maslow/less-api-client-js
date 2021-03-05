@@ -30,7 +30,6 @@ describe('Database sql', function () {
       .field(['articles.*','categories.name', 'categories.name cate_name'])
       .get()
     
-    console.log(res)
     assert.ok(res.data instanceof Array)
     assert.ok(res.data.length)
     assert.ok(res.data[0].id)
