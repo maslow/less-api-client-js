@@ -6,7 +6,7 @@ const config = {
   getAccessToken: () => '',
 }
 
-describe('Database', function () {
+describe('Database sql', function () {
   it('left join should be ok', async () => {
     const cloud = client.init(config)
 

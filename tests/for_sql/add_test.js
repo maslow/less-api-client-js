@@ -8,7 +8,7 @@ const config = {
 
 let category_id = null
 
-describe('Database', function () {
+describe('Database sql', function () {
   it('add one should be ok', async () => {
     const cloud = client.init(config)
 

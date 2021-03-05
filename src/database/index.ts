@@ -45,6 +45,11 @@ export class Db {
    */
   config: any
 
+  // 惯例通用 primaryKey， mongo: _id, mysql: id
+  get primaryKey(): string {
+    return this.config?.primaryKey || '_id'
+  }
+
   static reqClass: any
 
   static getAccessToken: Function

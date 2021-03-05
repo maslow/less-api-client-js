@@ -37,6 +37,10 @@ export class DocumentReference {
    */
   private _db: Db
 
+  get primaryKey(): string {
+    return this._db.primaryKey
+  }
+
   /**
    * 集合名称
    *
@@ -75,7 +79,7 @@ export class DocumentReference {
    * @param data - 文档数据
    * @internal
    */
-  create(data: any, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string }> {
+  create(data: any, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string, ok: boolean }> {
     callback = callback || createPromiseCallback()
 
     let params = {
@@ -85,7 +89,7 @@ export class DocumentReference {
     }
 
     if (this.id) {
-      params['_id'] = this.id
+      params[`${this.primaryKey}`] = this.id
     }
 
     this.request
@@ -95,9 +99,10 @@ export class DocumentReference {
           callback(0, res)
         } else {
           callback(0, {
-            id: res.data._id,
+            id: res.data._id || res.data.id,
             insertedCount: res.data.insertedCount,
-            requestId: res.requestId
+            requestId: res.requestId,
+            ok: true
           })
         }
       })
@@ -116,27 +121,27 @@ export class DocumentReference {
    *
    * @param data - 文档数据
    */
-  set(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string } | { code: string, message: string }> {
+  set(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string } | { code: string, error: string }> {
     callback = callback || createPromiseCallback()
 
     if (!this.id) {
       return Promise.resolve({
         code: 'INVALID_PARAM',
-        message: 'docId不能为空'
+        error: 'docId不能为空'
       })
     }
 
     if (!data || typeof data !== 'object') {
       return Promise.resolve({
         code: 'INVALID_PARAM',
-        message: '参数必需是非空对象'
+        error: '参数必需是非空对象'
       })
     }
 
     if (data.hasOwnProperty('_id')) {
       return Promise.resolve({
         code: 'INVALID_PARAM',
-        message: '不能更新_id的值'
+        error: '不能更新_id的值'
       })
     }
 
@@ -158,7 +163,7 @@ export class DocumentReference {
       //不能包含操作符
       return Promise.resolve({
         code: 'DATABASE_REQUEST_FAILED',
-        message: 'update operator complicit'
+        error: 'update operator complicit'
       })
     }
 
@@ -174,7 +179,7 @@ export class DocumentReference {
     }
 
     if (this.id) {
-      param['query'] = { _id: this.id }
+      param['query'] = { [this.primaryKey]: this.id }
     }
 
     this.request
@@ -203,24 +208,24 @@ export class DocumentReference {
    *
    * @param data - 文档数据
    */
-  update(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string } | { code: string, message: string }> {
+  update(data: Object, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string, ok: boolean } | { code: string, error: string }> {
     callback = callback || createPromiseCallback()
 
     if (!data || typeof data !== 'object') {
       return Promise.resolve({
         code: 'INVALID_PARAM',
-        message: '参数必需是非空对象'
+        error: '参数必需是非空对象'
       })
     }
 
     if (data.hasOwnProperty('_id')) {
       return Promise.resolve({
         code: 'INVALID_PARAM',
-        message: '不能更新_id的值'
+        error: '不能更新_id的值'
       })
     }
 
-    const query = { _id: this.id }
+    const query = { [this.primaryKey]: this.id }
     const merge = true //把所有更新数据转为带操作符的
     const param = {
       collectionName: this._coll,
@@ -243,7 +248,8 @@ export class DocumentReference {
             updated: res.data.updated,
             matched: res.data.matched,
             upsertedId: res.data.upserted_id,
-            requestId: res.requestId
+            requestId: res.requestId,
+            ok: true
           })
         }
       })
@@ -260,7 +266,7 @@ export class DocumentReference {
   remove(callback?: any): Promise<{ deleted: number, requestId: string }> {
     callback = callback || createPromiseCallback()
 
-    const query = { _id: this.id }
+    const query = { [this.primaryKey]: this.id }
     const param = {
       collectionName: this._coll,
       query: query,
@@ -288,12 +294,12 @@ export class DocumentReference {
   }
 
   /**
-   * 返回选中的文档（_id）
+   * 返回选中的文档
    */
   get(callback?: any): Promise<GetRes> {
     callback = callback || createPromiseCallback()
 
-    const query = { _id: this.id }
+    const query = { [this.primaryKey]: this.id }
     const param = {
       collectionName: this._coll,
       query: query,
