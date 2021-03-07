@@ -310,7 +310,7 @@ export class Query {
    * - 默认获取集合下全部文档数据
    * - 可以把通过 `orderBy`、`where`、`skip`、`limit`设置的数据添加请求参数上
    */
-  public get(callback?: any): Promise<GetRes | { code: string | number, error: string }> {
+  public get(options?: { nested: boolean }, callback?: any): Promise<GetRes | { code: string | number, error: string }> {
     /* eslint-disable no-param-reassign */
     callback = callback || createPromiseCallback()
 
@@ -328,11 +328,12 @@ export class Query {
       offset?: number
       limit?: number
       projection?: Object,
-      joins?: JoinParam[]
+      joins?: JoinParam[],
+      nested?: boolean
     }
     let param: Param = {
       collectionName: this._coll,
-      queryType: QueryType.WHERE
+      queryType: QueryType.WHERE,
     }
     if (this._fieldFilters) {
       param.query = this._fieldFilters
@@ -353,6 +354,9 @@ export class Query {
     }
     if (this._joins.length) {
       param.joins = this._joins
+    }
+    if (options) {
+      param.nested = options.nested ?? false 
     }
     this._request
       .send('database.queryDocument', param)
