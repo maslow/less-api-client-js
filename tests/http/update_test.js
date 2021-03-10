@@ -77,11 +77,13 @@ describe('Database', function () {
       .where({})
       .update({
         updatedField: 'content-add-3'
-      })
+      }, {multi: true})
        
+
     const { data } = await cloud.database()
       .collection('categories')
       .get()
+
       data.forEach( d => {
           assert.equal(d.updatedField, 'content-add-3')
       })

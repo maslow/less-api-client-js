@@ -16,6 +16,25 @@ interface GetRes {
   ok: boolean
 }
 
+interface UpdateRes {
+  updated: number,
+  matched: number,
+  upsertedId: number,
+  requestId: string,
+  ok: boolean
+}
+
+interface RemoveRes {
+  deleted: number,
+  requestId: string,
+  ok: boolean
+}
+
+interface ErrorRes {
+  code: string | number,
+  error: string
+}
+
 interface QueryOrder {
   field?: string
   direction?: 'asc' | 'desc'
@@ -310,7 +329,7 @@ export class Query {
    * - 默认获取集合下全部文档数据
    * - 可以把通过 `orderBy`、`where`、`skip`、`limit`设置的数据添加请求参数上
    */
-  public get(options?: { nested: boolean }, callback?: any): Promise<GetRes | { code: string | number, error: string }> {
+  public get(options?: { nested: boolean }, callback?: any): Promise<GetRes & ErrorRes> {
     /* eslint-disable no-param-reassign */
     callback = callback || createPromiseCallback()
 
@@ -356,7 +375,7 @@ export class Query {
       param.joins = this._joins
     }
     if (options) {
-      param.nested = options.nested ?? false 
+      param.nested = options.nested ?? false
     }
     this._request
       .send('database.queryDocument', param)
@@ -386,7 +405,7 @@ export class Query {
   /**
    * 获取总数
    */
-  public count(callback?: any): Promise<{ total: number, requestId: string, ok: boolean } | { code: string | number, error: string }> {
+  public count(callback?: any): Promise<{ total: number, requestId: string, ok: boolean } & ErrorRes> {
     callback = callback || createPromiseCallback()
 
     interface Param {
@@ -421,7 +440,7 @@ export class Query {
    *
    * @param data 数据
    */
-  public update(data: Object, options?: { multi: boolean, merge: boolean, upsert: boolean }, callback?: any): Promise<{ updated: number, matched: number, upsertedId: number, requestId: string, ok: boolean } | { code: string, error: string }> {
+  public update(data: Object, options?: { multi: boolean, merge: boolean, upsert: boolean }, callback?: any): Promise<UpdateRes & ErrorRes> {
     callback = callback || createPromiseCallback()
     if (!options) {
       options = {
@@ -439,14 +458,14 @@ export class Query {
       return Promise.resolve({
         code: 'INVALID_PARAM',
         error: '参数必需是非空对象'
-      })
+      } as any)
     }
 
     if (data.hasOwnProperty('_id')) {
       return Promise.resolve({
         code: 'INVALID_PARAM',
         error: '不能更新_id的值'
-      })
+      } as any)
     }
 
     let param = {
@@ -481,7 +500,7 @@ export class Query {
   /**
    * 条件删除文档
    */
-  public remove(options?: { multi: boolean }, callback?: any): Promise<{ deleted: number, requestId: string, ok: boolean } | { code: string | number, error: string }> {
+  public remove(options?: { multi: boolean }, callback?: any): Promise<RemoveRes & ErrorRes> {
     callback = callback || createPromiseCallback()
 
     if (!options) {

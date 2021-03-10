@@ -79,7 +79,7 @@ export class DocumentReference {
    * @param data - 文档数据
    * @internal
    */
-  create(data: any, options?: { multi: boolean }, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string, ok: boolean }> {
+  create(data: any, options?: { multi: boolean }, callback?: any): Promise<{ id: string | number, insertedCount: number, requestId: string, ok: boolean } & { code: string | number, error: string }> {
     callback = callback || createPromiseCallback()
     if (!options) {
       options = { multi: false }

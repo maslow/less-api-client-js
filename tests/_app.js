@@ -5,7 +5,10 @@ const util = require('util')
 const rules = {
   categories: {
     '.read': true,
-    '.update': true,
+    '.update': {
+      condition: true,
+      multi: true
+    },
     '.add': true,
     '.remove': true
   }
@@ -43,7 +46,7 @@ app.post('/entry', async (req, res) => {
   if (result.errors) {
     return res.send({
       code: 1,
-      data: errors
+      error: result.errors
     })
   }
 
