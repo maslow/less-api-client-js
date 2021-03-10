@@ -411,7 +411,8 @@ export class Query {
     interface Param {
       collectionName: string
       query?: Object
-      queryType: QueryType
+      queryType: QueryType,
+      joins?: JoinParam[]
     }
     let param: Param = {
       collectionName: this._coll,
@@ -419,6 +420,9 @@ export class Query {
     }
     if (this._fieldFilters) {
       param.query = this._fieldFilters
+    }
+    if (this._joins.length) {
+      param.joins = this._joins
     }
     this._request.send('database.countDocument', param).then(res => {
       if (res.code) {
@@ -476,9 +480,13 @@ export class Query {
       multi: options.multi,
       merge: options.merge,
       upsert: options.upsert,
-      data: UpdateSerializer.encode(data)
+      data: UpdateSerializer.encode(data),
+      joins: undefined
       // data: Util.encodeDocumentDataForReq(data, true)
       // data: this.convertParams(data)
+    }
+    if (this._joins.length) {
+      param.joins = this._joins
     }
 
     this._request.send('database.updateDocument', param).then(res => {
@@ -519,7 +527,11 @@ export class Query {
       collectionName: this._coll,
       query: QuerySerializer.encode(this._fieldFilters),
       queryType: QueryType.WHERE,
-      multi: options.multi
+      multi: options.multi,
+      joins: undefined
+    }
+    if (this._joins.length) {
+      param.joins = this._joins
     }
     this._request.send('database.deleteDocument', param).then(res => {
       if (res.code) {
