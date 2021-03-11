@@ -1,5 +1,5 @@
 
-import { Db } from './database'
+import { Db } from 'less-api-database'
 import { Request } from './request'
 
 export enum EnvironmentType {
