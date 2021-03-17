@@ -1,6 +1,4 @@
-
-# 数据库
-
+# API Reference
 - [获取数据库的引用](#获取数据库的引用)
 - [获取集合的引用](#获取集合的引用)
   - [集合 Collection](#集合-collection)
@@ -43,19 +41,6 @@
     - [pop](#pop)
     - [unshift](#unshift)
     - [shift](#shift)
-- [GEO地理位置](#geo地理位置)
-  - [GEO数据类型](#geo数据类型)
-    - [Point](#point)
-    - [LineString](#linestring)
-    - [Polygon](#polygon)
-    - [MultiPoint](#multipoint)
-    - [MultiLineString](#multilinestring)
-    - [MultiPolygon](#multipolygon)
-  - [GEO操作符](#geo操作符)
-    - [geoNear](#geonear)
-    - [geoWithin](#geowithin)
-    - [geoIntersects](#geointersects)
-- [数据库实时推送](#数据库实时推送)
 
 ## 获取数据库的引用
 
@@ -827,236 +812,35 @@ db.collection('comments').doc('comment-id').update({
 删除数组头部元素。使用同pop
 
 
-## GEO地理位置
+### Join 查询（仅MySQL）
+> 主要用于一对一或多对一关系的查询
 
-注意：**如果需要对类型为地理位置的字段进行搜索，一定要建立地理位置索引**。
-
-### GEO数据类型
-
-#### Point
-
-用于表示地理位置点，用经纬度唯一标记一个点，这是一个特殊的数据存储类型。
-
-签名：`Point(longitude: number, latitude: number)`
-
-示例：
 ```js
-new db.Geo.Point(longitude, latitude)
+const { data } = await db.collection('article')
+  .leftJoin('user', 'id', 'author_id')
+  .get()
+
+// 若左表与右表字段名有重复，避免字段覆盖的写法:
+const { data } = await db.collection('article')
+  .leftJoin('user', 'id', 'author_id')
+  .get({ nested: true })
+
+// 结果如下：[ { article: {}, user: {} }, ... ]
 ```
 
-#### LineString
-
-用于表示地理路径，是由两个或者更多的 `Point` 组成的线段。
-
-签名：`LineString(points: Point[])`
-
-示例：
+### 表查询（仅MySQL）
+> 主要用于「一对多」关系的子查询
 
 ```js
-new db.Geo.LineString([
-  new db.Geo.Point(lngA, latA),
-  new db.Geo.Point(lngB, latB),
-  // ...
-])
-```
+const { data } = await db.collection('article')
+      .with({
+        query: db.collection('tag'),
+        from: 'id',         // 主表连接键，即 article.id
+        to: 'article_id',   // 子表连接键，即 tag.article_id
+        as: 'tags'          // 查询结果中字段重命名，缺省为子表名
+      })
+      .merge()
 
-#### Polygon
-
-用于表示地理上的一个多边形（有洞或无洞均可），它是由一个或多个**闭环** `LineString` 组成的几何图形。
-
-由一个环组成的 `Polygon` 是没有洞的多边形，由多个环组成的是有洞的多边形。对由多个环（`LineString`）组成的多边形（`Polygon`），第一个环是外环，所有其他环是内环（洞）。
-
-签名：`Polygon(lines: LineString[])`
-
-示例：
-
-```js
-new db.Geo.Polygon([
-  new db.Geo.LineString(...),
-  new db.Geo.LineString(...),
-  // ...
-])
-```
-
-#### MultiPoint
-
-用于表示多个点 `Point` 的集合。
-
-签名：`MultiPoint(points: Point[])`
-
-示例：
-
-```js
-new db.Geo.MultiPoint([
-  new db.Geo.Point(lngA, latA),
-  new db.Geo.Point(lngB, latB),
-  // ...
-])
-```
-
-#### MultiLineString
-
-用于表示多个地理路径 `LineString` 的集合。
-
-签名：`MultiLineString(lines: LineString[])`
-
-示例：
-
-```js
-new db.Geo.MultiLineString([
-  new db.Geo.LineString(...),
-  new db.Geo.LineString(...),
-  // ...
-])
-```
-
-
-#### MultiPolygon
-
-用于表示多个地理多边形 `Polygon` 的集合。
-
-签名：`MultiPolygon(polygons: Polygon[])`
-
-示例：
-
-```js
-new db.Geo.MultiPolygon([
-  new db.Geo.Polygon(...),
-  new db.Geo.Polygon(...),
-  // ...
-])
-```
-
-### GEO操作符
-
-#### geoNear
-
-按从近到远的顺序，找出字段值在给定点的附近的记录。
-
-签名：
-```js
-db.command.geoNear(options: IOptions)
-
-interface IOptions {
-  geometry: Point // 点的地理位置
-  maxDistance?: number // 选填，最大距离，米为单位
-  minDistance?: number // 选填，最小距离，米为单位
-}
-```
-
-
-示例：
-
-```js
-db.collection('user').where({
-  location: db.command.geoNear({
-    geometry: new db.Geo.Point(lngA, latA),
-    maxDistance: 1000,
-    minDistance: 0
-  })
-})
-```
-
-#### geoWithin
-
-找出字段值在指定 Polygon / MultiPolygon 内的记录，无排序
-
-签名：
-
-```js
-db.command.geoWithin(IOptions)
-
-interface IOptions {
-  geometry: Polygon | MultiPolygon // 地理位置
-}
-```
-
-示例：
-
-```js
-// 一个闭合的区域
-const area = new Polygon([
-  new LineString([
-    new Point(lngA, latA),
-    new Point(lngB, latB),
-    new Point(lngC, latC),
-    new Point(lngA, latA)
-  ]),
-])
-
-// 搜索 location 字段在这个区域中的 user
-db.collection('user').where({
-  location: db.command.geoWithin({
-    geometry: area
-  })
-})
-```
-
-#### geoIntersects
-
-找出字段值和给定的地理位置图形相交的记录
-
-签名：
-
-```js
-db.command.geoIntersects(IOptions)
-
-interface IOptions {
-  geometry: Point | LineString | MultiPoint | MultiLineString | Polygon | MultiPolygon // 地理位置
-}
-```
-
-示例：
-
-```js
-// 一条路径
-const line = new LineString([
-  new Point(lngA, latA),
-  new Point(lngB, latB)
-])
-
-// 搜索 location 与这条路径相交的 user
-db.collection('user').where({
-  location: db.command.geoIntersects({
-    geometry: line
-  })
-})
-```
-
-## 数据库实时推送
-
-监听指定集合中符合查询条件的文档，通过onchange回调获得文档的变化详情
-(where参数为查询条件 参考 [查询文档](#查询文档))
-
-```js
-  const _ = db.command
-  const collection = db.collection('collName') // collName 需填当前env下集合名称
-
-  let ref = collection.where({ test: _.gt(0) }).watch({
-    onChange: snapshot => {
-        console.log("收到snapshot**********", snapshot)
-    },
-    onError: error => {
-      console.log("收到error**********", error)
-    }
-  })
-```
-
-单个doc的监听，也可以采用doc('docId').watch()形式
-
-```js
-  let ref = collection.doc('one docId').watch({
-    onChange: snapshot => {
-        console.log("收到snapshot**********", snapshot)
-    },
-    onError: error => {
-      console.log("收到error**********", error)
-    }
-  })
-```
-
-手动关闭监听，当前监听将不再收到推送
-
-```js
-  ref.close()
+console.log(data) 
+//  [ { id: 1, name: xxx, tags: [...] }  ]
 ```
