@@ -5,7 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
     entry: {
-        'less-api-client': './src/index.ts'
+        'less-api-client': './src/index-bundle.ts'
     },
     // devtool: 'inline-source-map',
     target: 'web',

@@ -838,8 +838,8 @@ const { data } = await db.collection('article')
 const { data } = await db.collection('article')
       .with({
         query: db.collection('tag'),
-        from: 'id',         // 主表连接键，即 article.id
-        to: 'article_id',   // 子表连接键，即 tag.article_id
+        localField: 'id',         // 主表连接键，即 article.id
+        foreignField: 'article_id',   // 子表连接键，即 tag.article_id
         as: 'tags'          // 查询结果中字段重命名，缺省为子表名
       })
       .merge()
@@ -856,8 +856,8 @@ console.log(data)
 const { data } = await db.collection('article')
       .withOne({
         query: db.collection('user'),
-        from: 'author_id',    // 主表连接键，即 article.id
-        to: 'id',             // 子表连接键，即 tag.article_id
+        localField: 'author_id',    // 主表连接键，即 article.id
+        foreignField: 'id',             // 子表连接键，即 tag.article_id
         as: 'author'          // 查询结果中字段重命名，缺省为子表名
       })
       .merge()

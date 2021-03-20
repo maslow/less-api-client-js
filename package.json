@@ -28,7 +28,7 @@
   "homepage": "https://github.com/Maslow/less-api-client-js#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "less-api-database": "0.3.0"
+    "less-api-database": "0.3.5"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
