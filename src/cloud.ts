@@ -8,6 +8,10 @@ export enum EnvironmentType {
   UNI_APP = 'uniapp'
 }
 
+export interface RequestInterface {
+  send(action: string, data: object): Promise<{ code: number, data: any, error: string }>
+}
+
 interface RequestOptions {
   headers?: Object,
   timeout?: number
@@ -19,7 +23,8 @@ interface Config {
   timeout?: number,
   environment?: EnvironmentType,
   requestOptions?: RequestOptions,
-  primaryKey?: string // mongo 主键为 '_id', 使用 mysql 时可将此键设为 id
+  requestClass?: RequestInterface,
+  primaryKey?: string, // mongo 主键为 '_id', 使用 mysql 时可将此键设为 id
 }
 
 class Cloud {
@@ -38,12 +43,17 @@ class Cloud {
       timeout,
       environment: config?.environment || EnvironmentType.H5,
       requestOptions: config?.requestOptions || {},
-      primaryKey: config?.primaryKey
+      primaryKey: config?.primaryKey,
+      requestClass: config?.requestClass
     }
   }
 
   database() {
-    Db.reqClass = Request
+    if (this.config?.requestClass) {
+      Db.reqClass = this.config?.requestClass
+    } else {
+      Db.reqClass = Request
+    }
     Db.getAccessToken = this.config.getAccessToken
 
     return new Db({ ...this.config })
@@ -53,5 +63,6 @@ class Cloud {
 export {
   Cloud,
   Config,
-  Db
+  Db,
+  Request
 }

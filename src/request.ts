@@ -1,5 +1,5 @@
 import request from 'axios'
-import { Config, EnvironmentType } from './cloud'
+import { Config, EnvironmentType, RequestInterface } from './cloud'
 
 interface GlobalObjectType {
   request: any
@@ -7,7 +7,7 @@ interface GlobalObjectType {
 declare const wx: GlobalObjectType
 declare const uni: GlobalObjectType
 
-export class Request {
+export class Request implements RequestInterface {
   private config: Config
   constructor(config: Config) {
     this.config = config
