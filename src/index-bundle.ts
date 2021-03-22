@@ -8,7 +8,7 @@ export * from './index'
 
 if (window) {
   window['LessApiClient'] = {
-    init,
+    initLessClient: init,
     Cloud,
     Db,
     EnvironmentType
