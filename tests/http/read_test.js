@@ -6,7 +6,8 @@ function getAccessToken(){
 }
 
 const config = {
-  entryUrl: 'http://localhost:8080/entry',
+  baseUrl: 'http://localhost:8080',
+  entryUrl: '/entry',
   getAccessToken,
 }
 

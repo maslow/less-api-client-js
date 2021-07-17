@@ -1,7 +1,10 @@
-import { Cloud, Config, Db, EnvironmentType, RequestInterface } from './cloud'
-import { Request } from './request'
+import { Cloud, Db,  } from './cloud'
+import { CloudOptions } from './types'
 
-function init(config: Config): Cloud {
+export * from './request'
+export * from './types'
+
+function init(config: CloudOptions): Cloud {
   return new Cloud(config)
 }
 
@@ -9,7 +12,4 @@ export {
   init,
   Cloud,
   Db,
-  EnvironmentType,
-  RequestInterface,
-  Request
 }

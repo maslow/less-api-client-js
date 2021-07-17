@@ -11,8 +11,10 @@ class CustomRequest extends Request {
     const encrypt = Buffer.from(str).toString('base64')
 
     return {
-      code: 1,
-      error: encrypt
+      data: {
+        code: 1,
+        error: encrypt
+      }
     }
   }
 }
