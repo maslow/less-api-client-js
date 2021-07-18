@@ -1,5 +1,11 @@
 ![](https://github.com/Maslow/less-api-client-js/workflows/release/badge.svg)
 
+
+# 警告（Warning!)
+
+> Deprecated: `less-api-client` 代码已并入 [`less-api`](https://github.com/Maslow/less-api)，此仓库不再维护！
+
+
 ### 介绍
 
 Javascript client sdk of [`less-api`](https://github.com/Maslow/less-api).
