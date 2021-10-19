@@ -3,7 +3,7 @@
 
 # 警告（Warning!)
 
-> Deprecated: `less-api-client` 代码已并入 [`less-api`](https://github.com/Maslow/less-api)，此仓库不再维护！
+> Deprecated: `less-api-client` 代码已并入 [`laf`](https://github.com/Maslow/laf)，此仓库不再维护！
 
 
 ### 介绍
